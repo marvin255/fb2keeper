@@ -48,4 +48,18 @@ public final class FileSystemHelper
 
         return dir;
     }
+
+    public static String getExtension(Path path)
+    {
+        if (path == null)
+        {
+            throw new IllegalArgumentException("Path can't be null");
+        }
+
+        String fileName = path.getFileName().toString();
+
+        int dotIndex = fileName.lastIndexOf('.');
+
+        return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1);
+    }
 }

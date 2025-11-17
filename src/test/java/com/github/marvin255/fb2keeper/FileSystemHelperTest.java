@@ -121,4 +121,35 @@ final class FileSystemHelperTest
 
         assertSame(tempDir, checkedDir);
     }
+
+    @Test
+    void testGetExtensionWithNull()
+    {
+        Exception exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> FileSystemHelper.getExtension(null)
+        );
+
+        assertEquals("Path can't be null", exception.getMessage());
+    }
+
+    @Test
+    void testGetExtension()
+    {
+        Path path = Paths.get("test.txt");
+
+        String extension = FileSystemHelper.getExtension(path);
+
+        assertEquals("txt", extension);
+    }
+
+    @Test
+    void testGetExtensionNoExtension()
+    {
+        Path path = Paths.get("test");
+
+        String extension = FileSystemHelper.getExtension(path);
+
+        assertEquals("", extension);
+    }
 }

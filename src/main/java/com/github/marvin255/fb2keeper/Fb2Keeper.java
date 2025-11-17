@@ -33,8 +33,8 @@ public final class Fb2Keeper
 
     public void keep(final Path source, final Path target) throws IOException
     {
-        checkDir(source);
-        checkDir(target);
+        FileSystemHelper.checkAndReturnDir(source);
+        FileSystemHelper.checkAndReturnDir(target);
 
         try (var files = Files.walk(source))
         {
@@ -89,22 +89,6 @@ public final class Fb2Keeper
         if (operations.stream().anyMatch(Objects::isNull))
         {
             throw new IllegalArgumentException("Operations list can't have nulls");
-        }
-    }
-
-    private void checkDir(final Path dir)
-    {
-        if (dir == null)
-        {
-            throw new IllegalArgumentException("Dir can't be null");
-        }
-        if (!Files.exists(dir))
-        {
-            throw new IllegalArgumentException("Dir doesn't exist: %s".formatted(dir.toString()));
-        }
-        if (!Files.isDirectory(dir))
-        {
-            throw new IllegalArgumentException("Path is not a dir: %s".formatted(dir.toString()));
         }
     }
 }

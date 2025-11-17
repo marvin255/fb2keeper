@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -75,53 +74,6 @@ final class Fb2KeeperTest
         );
 
         assertEquals("Operations list can't have nulls", exception.getMessage());
-    }
-
-    @Test
-    void testKeepWithNullSource()
-    {
-        Fb2Keeper fb2Keeper = new Fb2Keeper(List.of());
-
-        Exception exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> fb2Keeper.keep(null, target)
-        );
-
-        assertEquals("Dir can't be null", exception.getMessage());
-    }
-
-    @Test
-    void testKeepWithSourceThatDoesNotExist()
-    {
-        Path pathDoesNotExist = Paths.get("/does_not_exist");
-
-        Fb2Keeper fb2Keeper = new Fb2Keeper(List.of());
-
-        Exception exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> fb2Keeper.keep(pathDoesNotExist, target)
-        );
-
-        assertTrue(
-                exception.getMessage().startsWith("Dir doesn't exist"),
-                "Expected dir doesn't exist message"
-        );
-    }
-
-    @Test
-    void testKeepWithFileSource()
-    {
-        Fb2Keeper fb2Keeper = new Fb2Keeper(List.of());
-
-        Exception exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> fb2Keeper.keep(file, target)
-        );
-
-        assertTrue(
-                exception.getMessage().startsWith("Path is not a dir"),
-                "Expected path is not a dir message"
-        );
     }
 
     @Test

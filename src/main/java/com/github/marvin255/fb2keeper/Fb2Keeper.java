@@ -31,24 +31,27 @@ public final class Fb2Keeper
         this.logger = logger;
     }
 
-    public void keep(final Path source, final Path target) throws IOException
+    public void keep(Path source, Path target) throws IOException
     {
-        FileSystemHelper.checkAndReturnDir(source);
-        FileSystemHelper.checkAndReturnDir(target);
+        final Path checkedSource = FileSystemHelper.checkAndReturnDir(source);
+        final Path checkedTarget = FileSystemHelper.checkAndReturnDir(target);
 
         try (var files = Files.walk(source))
         {
             files.parallel()
                     .filter(this::isFileAllowedToKeep)
-                    .map(f -> new Fb2KeeperOperationContext(f, source, target))
+                    .map(f -> new Fb2KeeperOperationContext(f, checkedSource, checkedTarget))
                     .forEach(this::runFileOperations);
         }
     }
 
     private boolean isFileAllowedToKeep(Path file)
     {
-        return Files.isRegularFile(file)
-                && (file.toString().endsWith(".fb2") || file.toString().endsWith(".fb2.zip"));
+        boolean isFb2 = file.toString().endsWith(".fb2")
+                || file.toString().endsWith(".fb2.zip")
+                || file.toString().endsWith(".fbz");
+
+        return Files.isRegularFile(file) && isFb2;
     }
 
     private void runFileOperations(Fb2KeeperOperationContext context)

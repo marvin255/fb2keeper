@@ -152,4 +152,45 @@ final class FileSystemHelperTest
 
         assertEquals("", extension);
     }
+
+    @Test
+    void testGetFileNameWithoutExtensionWithNull()
+    {
+        Exception exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> FileSystemHelper.getFileNameWithoutExtension(null)
+        );
+
+        assertEquals("Path can't be null", exception.getMessage());
+    }
+
+    @Test
+    void testGetFileNameWithoutExtension()
+    {
+        Path path = Paths.get("test.txt");
+
+        String extension = FileSystemHelper.getFileNameWithoutExtension(path);
+
+        assertEquals("test", extension);
+    }
+
+    @Test
+    void testGetFileNameWithoutExtensionNoExtension()
+    {
+        Path path = Paths.get("test");
+
+        String extension = FileSystemHelper.getFileNameWithoutExtension(path);
+
+        assertEquals("test", extension);
+    }
+
+    @Test
+    void testGetFileNameWithoutExtensionMultipleDots()
+    {
+        Path path = Paths.get("test.fb2.zip");
+
+        String extension = FileSystemHelper.getFileNameWithoutExtension(path);
+
+        assertEquals("test.fb2", extension);
+    }
 }

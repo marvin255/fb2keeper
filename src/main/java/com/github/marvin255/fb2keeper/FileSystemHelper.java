@@ -62,4 +62,18 @@ public final class FileSystemHelper
 
         return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1);
     }
+
+    public static String getFileNameWithoutExtension(Path path)
+    {
+        if (path == null)
+        {
+            throw new IllegalArgumentException("Path can't be null");
+        }
+
+        String fileName = path.getFileName().toString();
+
+        int dotIndex = fileName.lastIndexOf('.');
+
+        return (dotIndex == -1) ? fileName : fileName.substring(0, dotIndex);
+    }
 }

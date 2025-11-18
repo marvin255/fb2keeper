@@ -16,9 +16,9 @@ final class OperationCopyFileToTarget implements Function<Fb2KeeperOperationCont
     public Fb2KeeperOperationContext apply(Fb2KeeperOperationContext fb2KeeperOperationContext)
     {
         Path file = FileSystemHelper.checkAndReturnFile(fb2KeeperOperationContext.path());
-        Path target = FileSystemHelper.checkAndReturnDir(fb2KeeperOperationContext.target());
+        Path targetFolder = FileSystemHelper.checkAndReturnDir(fb2KeeperOperationContext.target());
+        Path newFile = getNewFilePath(targetFolder, file);
 
-        Path newFile = getNewFilePath(target, file);
         copyFile(file, newFile);
 
         return fb2KeeperOperationContext.withPath(newFile);

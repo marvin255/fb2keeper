@@ -12,8 +12,6 @@ import java.util.zip.ZipOutputStream;
 
 public final class OperationZipFb2File implements Function<Fb2KeeperOperationContext, Fb2KeeperOperationContext>
 {
-    public static final String FB2_ZIP_EXTENSION = ".fb2.zip";
-
     @Override
     public Fb2KeeperOperationContext apply(Fb2KeeperOperationContext fb2KeeperOperationContext)
     {
@@ -30,7 +28,8 @@ public final class OperationZipFb2File implements Function<Fb2KeeperOperationCon
     {
         return Paths.get(
                 target.toAbsolutePath().toString(),
-                FileSystemHelper.getFileNameWithoutExtension(file) + FB2_ZIP_EXTENSION
+                FileSystemHelper.getFileNameWithoutExtension(file)
+                        + "." + FileSystemHelper.getFB2ZipExtension()
         );
     }
 

@@ -47,11 +47,8 @@ public final class Fb2Keeper
 
     private boolean isFileAllowedToKeep(Path file)
     {
-        boolean isFb2 = file.toString().endsWith(".fb2")
-                || file.toString().endsWith(".fb2.zip")
-                || file.toString().endsWith(".fbz");
-
-        return Files.isRegularFile(file) && isFb2;
+        return Files.isRegularFile(file)
+                && (FileSystemHelper.isFB2(file) || FileSystemHelper.isFB2Zip(file));
     }
 
     private void runFileOperations(Fb2KeeperOperationContext context)

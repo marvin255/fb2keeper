@@ -193,4 +193,44 @@ final class FileSystemHelperTest
 
         assertEquals("test.fb2", extension);
     }
+
+    @Test
+    void testIsFB2()
+    {
+        Path path = Paths.get("test.fb2");
+
+        assertTrue(FileSystemHelper.isFB2(path));
+    }
+
+    @Test
+    void testIsNotFB2()
+    {
+        Path path = Paths.get("test.fb2.zip");
+
+        assertFalse(FileSystemHelper.isFB2(path));
+    }
+
+    @Test
+    void testIsFB2ZipFBZ()
+    {
+        Path path = Paths.get("test.fbz");
+
+        assertTrue(FileSystemHelper.isFB2Zip(path));
+    }
+
+    @Test
+    void testIsFB2ZipFB2Zip()
+    {
+        Path path = Paths.get("test.fb2.zip");
+
+        assertTrue(FileSystemHelper.isFB2Zip(path));
+    }
+
+    @Test
+    void testIsNotFB2Zip()
+    {
+        Path path = Paths.get("test.zip");
+
+        assertFalse(FileSystemHelper.isFB2Zip(path));
+    }
 }

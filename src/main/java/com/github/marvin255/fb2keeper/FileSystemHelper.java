@@ -76,4 +76,21 @@ public final class FileSystemHelper
 
         return (dotIndex == -1) ? fileName : fileName.substring(0, dotIndex);
     }
+
+    public static boolean isFB2(Path path)
+    {
+        return path != null && path.getFileName().toString().toLowerCase().endsWith(".fb2");
+    }
+
+    public static boolean isFB2Zip(Path path)
+    {
+        if (path == null)
+        {
+            return false;
+        }
+
+        String fileName = path.getFileName().toString().toLowerCase();
+
+        return fileName.endsWith(".fbz") || fileName.endsWith(".fb2.zip");
+    }
 }

@@ -53,7 +53,7 @@ public final class Fb2Keeper
 
     private void runFileOperations(Fb2KeeperOperationContext context)
     {
-        Fb2KeeperOperationContext operationContext = context;
+        Fb2KeeperOperationContext operationContext = Objects.requireNonNull(context);
         for (var operation : operations)
         {
             try
@@ -74,7 +74,7 @@ public final class Fb2Keeper
                                     .formatted(
                                             operation.getClass().getName(),
                                             operationContext == null ? "empty context" : operationContext.path().toString(),
-                                            context == null ? "empty context" : context.path().toString(),
+                                            context.path().toString(),
                                             e.getMessage()
                                     )
                     );

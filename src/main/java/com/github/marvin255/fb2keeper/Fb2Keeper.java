@@ -59,6 +59,10 @@ public final class Fb2Keeper
             try
             {
                 operationContext = operation.apply(operationContext);
+                if (operationContext == null)
+                {
+                    throw new IllegalArgumentException("Operation returned null context");
+                }
             }
             catch (Exception e)
             {
@@ -69,8 +73,8 @@ public final class Fb2Keeper
                             "File operation '%s' for file '%s' (original file '%s') failed with an exception: %s"
                                     .formatted(
                                             operation.getClass().getName(),
-                                            operationContext.path().toString(),
-                                            context.path().toString(),
+                                            operationContext == null ? "empty context" : operationContext.path().toString(),
+                                            context == null ? "empty context" : context.path().toString(),
                                             e.getMessage()
                                     )
                     );

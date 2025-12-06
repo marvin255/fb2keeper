@@ -112,6 +112,26 @@ final class Fb2KeeperTest
     }
 
     @Test
+    void testKeepCleansTarget() throws IOException
+    {
+        Path nestedFolder = Files.createTempDirectory(target, "nested_folder");
+        Files.createTempFile(nestedFolder, "nested_file", ".txt");
+        Path targetFile = Files.createTempFile(target, "target_file", ".txt");
+
+        Fb2Keeper fb2Keeper = new Fb2Keeper(List.of());
+        fb2Keeper.keep(source, target);
+
+        assertFalse(
+                Files.exists(targetFile),
+                "Keep method must remove all files from target"
+        );
+        assertFalse(
+                Files.exists(nestedFolder),
+                "Keep method must remove all folders from target"
+        );
+    }
+
+    @Test
     void testKeepWithExceptionInOperation() throws IOException
     {
         ConcurrentLinkedQueue<String> results = new ConcurrentLinkedQueue<>();

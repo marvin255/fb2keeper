@@ -3,6 +3,7 @@ package com.github.marvin255.fb2keeper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -26,7 +27,6 @@ public final class Fb2Keeper
     )
     {
         checkOperations(operations);
-
         this.operations = List.copyOf(operations);
         this.logger = logger;
     }
@@ -35,7 +35,7 @@ public final class Fb2Keeper
     {
         final Path checkedSource = FileSystemHelper.checkAndReturnDir(source);
         final Path checkedTarget = FileSystemHelper.checkAndReturnDir(target);
-
+        cleanTarget(checkedTarget);
         try (var files = Files.walk(source))
         {
             files.parallel()
@@ -66,19 +66,16 @@ public final class Fb2Keeper
             }
             catch (Exception e)
             {
-                if (logger != null)
-                {
-                    logger.log(
-                            Level.SEVERE,
-                            "File operation '%s' for file '%s' (original file '%s') failed with an exception: %s"
-                                    .formatted(
-                                            operation.getClass().getName(),
-                                            operationContext == null ? "empty context" : operationContext.path().toString(),
-                                            context.path().toString(),
-                                            e.getMessage()
-                                    )
-                    );
-                }
+                log(
+                        Level.SEVERE,
+                        "File operation '%s' for file '%s' (original file '%s') failed with an exception: %s"
+                                .formatted(
+                                        operation.getClass().getName(),
+                                        operationContext == null ? "empty context" : operationContext.path().toString(),
+                                        context.path().toString(),
+                                        e.getMessage()
+                                )
+                );
                 break;
             }
         }
@@ -93,6 +90,40 @@ public final class Fb2Keeper
         if (operations.stream().anyMatch(Objects::isNull))
         {
             throw new IllegalArgumentException("Operations list can't have nulls");
+        }
+    }
+
+    private void cleanTarget(Path target)
+    {
+        try (var stream = Files.walk(target))
+        {
+            stream.filter(path -> !path.equals(target))
+                    .sorted(Comparator.reverseOrder())
+                    .forEach(path -> {
+                        try
+                        {
+                            Files.delete(path);
+                        }
+                        catch (IOException e)
+                        {
+                            throw new RuntimeException(e);
+                        }
+                    });
+        }
+        catch (Exception e)
+        {
+            log(
+                    Level.SEVERE,
+                    "Can't clean the target folder '%s'".formatted(target.toAbsolutePath().toString())
+            );
+        }
+    }
+
+    private void log(Level level, String message)
+    {
+        if (logger != null)
+        {
+            logger.log(level, message);
         }
     }
 }

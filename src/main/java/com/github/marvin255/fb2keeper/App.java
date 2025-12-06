@@ -10,6 +10,7 @@ public final class App
     private static final Fb2Keeper KEEPER = new Fb2Keeper(
             List.of(
                     new OperationCopyFileToTarget(),
+                    new OperationUnzipFb2File(),
                     new OperationZipFb2File()
             ),
             Logger.getLogger(App.class.getName())

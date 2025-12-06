@@ -41,7 +41,8 @@ final class OperationZipFb2FileTest
     {
         Path archivePath = Paths.get(
                 target.toAbsolutePath().toString(),
-                FileSystemHelper.getFileNameWithoutExtension(file) + ".fb2.zip"
+                FileSystemHelper.getFileNameWithoutExtension(file)
+                        + "." + FileSystemHelper.getFB2ZipExtension()
         );
 
         OperationZipFb2File operation = new OperationZipFb2File();

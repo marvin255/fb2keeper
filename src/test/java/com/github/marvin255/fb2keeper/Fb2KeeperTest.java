@@ -112,6 +112,26 @@ final class Fb2KeeperTest
     }
 
     @Test
+    void testKeepCleansTarget() throws IOException
+    {
+        Path nestedFolder = Files.createTempDirectory(target, "nested_folder");
+        Files.createTempFile(nestedFolder, "nested_file", ".txt");
+        Path targetFile = Files.createTempFile(target, "target_file", ".txt");
+
+        Fb2Keeper fb2Keeper = new Fb2Keeper(List.of());
+        fb2Keeper.keep(source, target);
+
+        assertFalse(
+                Files.exists(targetFile),
+                "Keep method must remove all files from target"
+        );
+        assertFalse(
+                Files.exists(nestedFolder),
+                "Keep method must remove all folders from target"
+        );
+    }
+
+    @Test
     void testKeepWithExceptionInOperation() throws IOException
     {
         ConcurrentLinkedQueue<String> results = new ConcurrentLinkedQueue<>();
@@ -157,5 +177,36 @@ final class Fb2KeeperTest
         fb2Keeper.keep(source, target);
 
         verify(loggerMock, times(1)).log(eq(Level.SEVERE), anyString());
+    }
+
+    @Test
+    void testKeepWithNullContext() throws IOException
+    {
+        ConcurrentLinkedQueue<String> results = new ConcurrentLinkedQueue<>();
+        Function<Fb2KeeperOperationContext, Fb2KeeperOperationContext> operation1 = f -> {
+            if (f.path().toString().equals(file1.toString()))
+            {
+                return null;
+            }
+            results.add("operation 1 " + f.path());
+            return f;
+        };
+        Function<Fb2KeeperOperationContext, Fb2KeeperOperationContext> operation2 = f -> {
+            results.add("operation 2 " + f.path());
+            return f;
+        };
+
+        Fb2Keeper fb2Keeper = new Fb2Keeper(List.of(operation1, operation2));
+        fb2Keeper.keep(source, target);
+
+        assertEquals(2, results.size());
+        assertTrue(
+                results.contains("operation 1 " + file),
+                "Expect that operation 1 handles file 1"
+        );
+        assertTrue(
+                results.contains("operation 2 " + file),
+                "Expect that operation 2 handles file 1"
+        );
     }
 }

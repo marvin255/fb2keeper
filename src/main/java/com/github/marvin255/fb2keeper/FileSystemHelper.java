@@ -5,6 +5,10 @@ import java.nio.file.Path;
 
 public final class FileSystemHelper
 {
+    private static final String EXTENSION_FB2 = "fb2";
+    private static final String EXTENSION_FBZ = "fbz";
+    private static final String EXTENSION_FB2_ZIP = "fb2.zip";
+
     private FileSystemHelper()
     {
     }
@@ -57,6 +61,10 @@ public final class FileSystemHelper
         }
 
         String fileName = path.getFileName().toString();
+        if (fileName.toLowerCase().endsWith("." + EXTENSION_FB2_ZIP))
+        {
+            return EXTENSION_FB2_ZIP;
+        }
 
         int dotIndex = fileName.lastIndexOf('.');
 
@@ -71,9 +79,35 @@ public final class FileSystemHelper
         }
 
         String fileName = path.getFileName().toString();
+        if (fileName.toLowerCase().endsWith("." + EXTENSION_FB2_ZIP))
+        {
+            return fileName.substring(0, fileName.length() - 8);
+        }
 
         int dotIndex = fileName.lastIndexOf('.');
 
         return (dotIndex == -1) ? fileName : fileName.substring(0, dotIndex);
+    }
+
+    public static boolean isFB2(Path path)
+    {
+        return path != null && path.getFileName().toString().toLowerCase().endsWith("." + EXTENSION_FB2);
+    }
+
+    public static boolean isFB2Zip(Path path)
+    {
+        if (path == null)
+        {
+            return false;
+        }
+
+        String fileName = path.getFileName().toString().toLowerCase();
+
+        return fileName.endsWith("." + EXTENSION_FBZ) || fileName.endsWith("." + EXTENSION_FB2_ZIP);
+    }
+
+    public static String getFB2ZipExtension()
+    {
+        return EXTENSION_FBZ;
     }
 }

@@ -144,6 +144,16 @@ final class FileSystemHelperTest
     }
 
     @Test
+    void testGetExtensionFB2Zip()
+    {
+        Path path = Paths.get("test.fb2.zip");
+
+        String extension = FileSystemHelper.getExtension(path);
+
+        assertEquals("fb2.zip", extension);
+    }
+
+    @Test
     void testGetExtensionNoExtension()
     {
         Path path = Paths.get("test");
@@ -169,9 +179,9 @@ final class FileSystemHelperTest
     {
         Path path = Paths.get("test.txt");
 
-        String extension = FileSystemHelper.getFileNameWithoutExtension(path);
+        String name = FileSystemHelper.getFileNameWithoutExtension(path);
 
-        assertEquals("test", extension);
+        assertEquals("test", name);
     }
 
     @Test
@@ -179,18 +189,86 @@ final class FileSystemHelperTest
     {
         Path path = Paths.get("test");
 
-        String extension = FileSystemHelper.getFileNameWithoutExtension(path);
+        String name = FileSystemHelper.getFileNameWithoutExtension(path);
 
-        assertEquals("test", extension);
+        assertEquals("test", name);
     }
 
     @Test
     void testGetFileNameWithoutExtensionMultipleDots()
     {
+        Path path = Paths.get("test.test.zip");
+
+        String name = FileSystemHelper.getFileNameWithoutExtension(path);
+
+        assertEquals("test.test", name);
+    }
+
+    @Test
+    void testGetFileNameWithoutExtensionFB2Zip()
+    {
         Path path = Paths.get("test.fb2.zip");
 
-        String extension = FileSystemHelper.getFileNameWithoutExtension(path);
+        String name = FileSystemHelper.getFileNameWithoutExtension(path);
 
-        assertEquals("test.fb2", extension);
+        assertEquals("test", name);
+    }
+
+    @Test
+    void testIsFB2()
+    {
+        Path path = Paths.get("test.fb2");
+
+        assertTrue(FileSystemHelper.isFB2(path));
+    }
+
+    @Test
+    void testIsFB2Null()
+    {
+        assertFalse(FileSystemHelper.isFB2(null));
+    }
+
+    @Test
+    void testIsNotFB2()
+    {
+        Path path = Paths.get("test.fb2.zip");
+
+        assertFalse(FileSystemHelper.isFB2(path));
+    }
+
+    @Test
+    void testIsFB2ZipFBZ()
+    {
+        Path path = Paths.get("test.fbz");
+
+        assertTrue(FileSystemHelper.isFB2Zip(path));
+    }
+
+    @Test
+    void testIsFB2ZipFB2Zip()
+    {
+        Path path = Paths.get("test.fb2.zip");
+
+        assertTrue(FileSystemHelper.isFB2Zip(path));
+    }
+
+    @Test
+    void testIsFB2ZipFB2ZipNull()
+    {
+        assertFalse(FileSystemHelper.isFB2Zip(null));
+    }
+
+    @Test
+    void testIsNotFB2Zip()
+    {
+        Path path = Paths.get("test.zip");
+
+        assertFalse(FileSystemHelper.isFB2Zip(path));
+    }
+
+    @Test
+    void testGetFB2ZipExtension()
+    {
+        assertEquals("fbz", FileSystemHelper.getFB2ZipExtension());
     }
 }

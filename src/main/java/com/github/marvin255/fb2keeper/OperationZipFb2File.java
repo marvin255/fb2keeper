@@ -42,7 +42,7 @@ public final class OperationZipFb2File implements Function<Fb2KeeperOperationCon
         )
         {
 
-            ZipEntry zipEntry = new ZipEntry(FileSystemHelper.getFileNameWithoutExtension(file));
+            ZipEntry zipEntry = new ZipEntry(file.getFileName().toString());
             zos.putNextEntry(zipEntry);
 
             byte[] buffer = new byte[1024];

@@ -11,6 +11,7 @@ public final class App
             List.of(
                     new OperationCopyFileToTarget(),
                     new OperationUnzipFb2File(),
+                    new OperationRenameToBookName(),
                     new OperationZipFb2File()
             ),
             Logger.getLogger(App.class.getName())

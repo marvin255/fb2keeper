@@ -40,7 +40,7 @@ final class OperationZipFb2FileTest
     void apply()
     {
         Path archivePath = Paths.get(
-                target.toAbsolutePath().toString(),
+                file.getParent().toString(),
                 FileSystemHelper.getFileNameWithoutExtension(file)
                         + "." + FileSystemHelper.getFB2ZipExtension()
         );

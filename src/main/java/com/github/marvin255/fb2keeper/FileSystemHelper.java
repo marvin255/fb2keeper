@@ -30,7 +30,7 @@ public final class FileSystemHelper
             throw new IllegalArgumentException("Path is not a file: %s".formatted(file.toString()));
         }
 
-        return file;
+        return file.toAbsolutePath();
     }
 
     public static Path checkAndReturnDir(Path dir)
@@ -50,7 +50,7 @@ public final class FileSystemHelper
             throw new IllegalArgumentException("Path is not a dir: %s".formatted(dir.toString()));
         }
 
-        return dir;
+        return dir.toAbsolutePath();
     }
 
     public static String getExtension(Path path)

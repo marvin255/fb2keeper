@@ -60,7 +60,11 @@ public final class FileSystemHelper
             throw new IllegalArgumentException("Path can't be null");
         }
 
-        String fileName = path.getFileName().toString();
+        return getExtension(path.getFileName().toString());
+    }
+
+    public static String getExtension(String fileName)
+    {
         if (fileName.toLowerCase().endsWith("." + EXTENSION_FB2_ZIP))
         {
             return EXTENSION_FB2_ZIP;

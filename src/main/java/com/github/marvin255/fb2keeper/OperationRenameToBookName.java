@@ -89,43 +89,46 @@ public final class OperationRenameToBookName implements Function<Fb2KeeperOperat
 
     private BookData getBookData(Path filePath)
     {
-        Document doc;
+        Document doc = openDocument(filePath);
+
+        String authorName = extractStringValueFromDocument(
+                doc,
+                "FictionBook > description > title-info > author > first-name"
+        );
+        String authorLastName = extractStringValueFromDocument(
+                doc,
+                "FictionBook > description > title-info > author > last-name"
+        );
+        String name = extractStringValueFromDocument(
+                doc,
+                "FictionBook > description > title-info > book-title"
+        );
+
+        return new BookData(authorLastName + " " + authorName, name);
+    }
+
+    private Document openDocument(Path filePath)
+    {
         try
         {
-            doc = Jsoup.parse(
-                    new File(filePath.toAbsolutePath().toString())
-            );
+            File file = new File(filePath.toAbsolutePath().toString());
+            return Jsoup.parse(file);
         }
         catch (IOException e)
         {
             throw new RuntimeException(e);
         }
+    }
 
-        String authorName = doc.select("FictionBook > description > title-info > author > first-name")
-                .text()
-                .trim();
-        if (authorName.isEmpty())
+    private String extractStringValueFromDocument(Document doc, String cssQuery)
+    {
+        String value = doc.select(cssQuery).text().trim();
+        if (value.isEmpty())
         {
-            throw new RuntimeException("Author name can't be empty");
+            throw new RuntimeException("Field '%s' name can't be empty".formatted(cssQuery));
         }
 
-        String authorLastName = doc.select("FictionBook > description > title-info > author > last-name")
-                .text()
-                .trim();
-        if (authorLastName.isEmpty())
-        {
-            throw new RuntimeException("Author last name can't be empty");
-        }
-
-        String name = doc.select("FictionBook > description > title-info > book-title")
-                .text()
-                .trim();
-        if (name.isEmpty())
-        {
-            throw new RuntimeException("Book name can't be empty");
-        }
-
-        return new BookData(authorLastName + " " + authorName, name);
+        return value;
     }
 
     private record BookData(String author, String name)

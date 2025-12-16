@@ -16,7 +16,7 @@ final class StripedPathLockerTest
     @Test
     void runLockedFunction()
     {
-        String result = StripedPathLocker.runLocked(
+        String result = StripedPathLocker.runLockedFunction(
                 PATH,
                 p -> "function: " + p.toAbsolutePath()
         );
@@ -30,7 +30,7 @@ final class StripedPathLockerTest
         final List<String> results = new ArrayList<>();
         Consumer<Path> consumer = p -> results.add(p.toString());
 
-        StripedPathLocker.runLocked(PATH, consumer);
+        StripedPathLocker.runLockedAction(PATH, consumer);
 
         assertEquals(List.of(PATH.toString()), results);
     }

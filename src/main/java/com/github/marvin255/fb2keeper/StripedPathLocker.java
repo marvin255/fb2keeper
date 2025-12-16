@@ -30,9 +30,9 @@ public final class StripedPathLocker
         return LOCKS[hash & (STRIPES - 1)];
     }
 
-    public static void runLocked(Path path, Consumer<Path> action)
+    public static void runLockedAction(Path path, Consumer<Path> action)
     {
-        runLocked(
+        runLockedFunction(
                 path,
                 p -> {
                     action.accept(p);
@@ -41,7 +41,7 @@ public final class StripedPathLocker
         );
     }
 
-    public static <T> T runLocked(Path path, Function<Path, T> action)
+    public static <T> T runLockedFunction(Path path, Function<Path, T> action)
     {
         Objects.requireNonNull(path, "path");
         Objects.requireNonNull(action, "action");

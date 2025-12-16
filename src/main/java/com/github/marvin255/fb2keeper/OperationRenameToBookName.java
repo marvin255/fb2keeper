@@ -18,20 +18,26 @@ public final class OperationRenameToBookName implements Function<Fb2KeeperOperat
         Path targetDirPath = FileSystemHelper.checkAndReturnDir(fb2KeeperOperationContext.target());
 
         BookData bookData = getBookData(filePath);
-        Path authorFolderPath = checkAndReturnAuthorFolder(targetDirPath, bookData);
-        Path newFilePath = renameFileAndReturnPath(filePath, authorFolderPath, bookData);
+        Path authorFolderPath = getAuthorFolder(targetDirPath, bookData);
+        Path newFilePath = renameFileUsingBookData(filePath, authorFolderPath, bookData);
 
         return fb2KeeperOperationContext.withPath(newFilePath);
     }
 
-    private Path checkAndReturnAuthorFolder(Path targetDirPath, BookData bookData)
+    private Path getAuthorFolder(Path baseDir, BookData bookData)
     {
-        Path authorFolderPath = targetDirPath.resolve(bookData.author());
+        return StripedPathLocker.runLockedFunction(
+                baseDir.resolve(bookData.author()),
+                this::createAndReturnAuthorFolder
+        );
+    }
 
+    private Path createAndReturnAuthorFolder(Path authorFolderPath)
+    {
         if (Files.exists(authorFolderPath) && !Files.isDirectory(authorFolderPath))
         {
             throw new RuntimeException(
-                    "Can't create author directory, because it's a file: %s".formatted(targetDirPath.toString())
+                    "Can't create author directory, because it's a file: %s".formatted(authorFolderPath.toString())
             );
         }
 
@@ -50,29 +56,35 @@ public final class OperationRenameToBookName implements Function<Fb2KeeperOperat
         return authorFolderPath.toAbsolutePath();
     }
 
-    private Path renameFileAndReturnPath(Path filePath, Path targetDirPath, BookData bookData)
+    private Path renameFileUsingBookData(Path filePath, Path targetDirPath, BookData bookData)
     {
-        Path newPath = targetDirPath.resolve(
-                bookData.name() + "." + FileSystemHelper.getExtension(filePath)
+        return StripedPathLocker.runLockedFunction(
+                targetDirPath.resolve(
+                        bookData.name() + "." + FileSystemHelper.getExtension(filePath)
+                ),
+                p -> renameFile(filePath, p)
         );
+    }
 
-        if (Files.exists(newPath))
+    private Path renameFile(Path from, Path to)
+    {
+        if (Files.exists(to))
         {
             throw new RuntimeException(
-                    "Book file %s already exists".formatted(newPath.toString())
+                    "Book file %s already exists".formatted(to.toString())
             );
         }
 
         try
         {
-            Files.move(filePath, newPath);
+            Files.move(from, to);
         }
         catch (IOException e)
         {
             throw new RuntimeException(e);
         }
 
-        return newPath.toAbsolutePath();
+        return to.toAbsolutePath();
     }
 
     private BookData getBookData(Path filePath)

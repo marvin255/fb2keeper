@@ -2,6 +2,7 @@ package com.github.marvin255.fb2keeper;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import java.io.File;
 import java.io.IOException;
@@ -122,10 +123,16 @@ public final class OperationRenameToBookName implements Function<Fb2KeeperOperat
 
     private String extractStringValueFromDocument(Document doc, String cssQuery)
     {
-        String value = doc.select(cssQuery).text().trim();
+        Element element = doc.selectFirst(cssQuery);
+        if (element == null)
+        {
+            throw new RuntimeException("Field '%s' is not found".formatted(cssQuery));
+        }
+
+        String value = element.text().trim();
         if (value.isEmpty())
         {
-            throw new RuntimeException("Field '%s' name can't be empty".formatted(cssQuery));
+            throw new RuntimeException("Field '%s' can't be empty".formatted(cssQuery));
         }
 
         return value;

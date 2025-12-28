@@ -74,6 +74,10 @@ public final class Fb2FileImpl implements Fb2File
 
     private String extractStringValue(Element element)
     {
+        if (element == null)
+        {
+            return "";
+        }
         return Objects.requireNonNull(element).text().trim();
     }
 

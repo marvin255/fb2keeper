@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 final class Fb2FileImplTest
 {
@@ -52,13 +53,13 @@ final class Fb2FileImplTest
     void before() throws IOException
     {
         file = Files.writeString(
-                Files.createTempFile(tempDir, "file", ".fb2"),
+                Files.createTempFile(tempDir, "Fb2FileImplTest", ".fb2"),
                 FILE_CONTENT
         );
     }
 
     @Test
-    void title()
+    void testTitle()
     {
         Fb2FileImpl fb2File = new Fb2FileImpl(file);
         String title = fb2File.title();
@@ -67,7 +68,50 @@ final class Fb2FileImplTest
     }
 
     @Test
-    void authors()
+    void testTitleNoTitle() throws IOException
+    {
+        String contentNoBookName = """
+                <?xml version="1.0" encoding="utf-8"?>
+                <FictionBook>
+                    <description>
+                        <title-info>
+                        </title-info>
+                    </description>
+                </FictionBook>""";
+
+        Path file = Files.writeString(
+                Files.createTempFile(tempDir, "testTitleNoTitle", ".fb2"),
+                contentNoBookName
+        );
+        Fb2FileImpl fb2File = new Fb2FileImpl(file);
+
+        assertTrue(fb2File.title().isEmpty());
+    }
+
+    @Test
+    void testTitleBlankTitle() throws IOException
+    {
+        String contentNoBookName = """
+                <?xml version="1.0" encoding="utf-8"?>
+                <FictionBook>
+                    <description>
+                        <title-info>
+                            <book-title>  </book-title>
+                        </title-info>
+                    </description>
+                </FictionBook>""";
+
+        Path file = Files.writeString(
+                Files.createTempFile(tempDir, "testTitleBlankTitle", ".fb2"),
+                contentNoBookName
+        );
+        Fb2FileImpl fb2File = new Fb2FileImpl(file);
+
+        assertTrue(fb2File.title().isEmpty());
+    }
+
+    @Test
+    void testAuthors()
     {
         Fb2FileImpl fb2File = new Fb2FileImpl(file);
         List<Fb2File.Author> authors = fb2File.authors();
@@ -77,5 +121,133 @@ final class Fb2FileImplTest
         assertEquals(AUTHOR_LAST_NAME, authors.getFirst().lastName());
         assertEquals(AUTHOR_1_FIRST_NAME, authors.get(1).name());
         assertEquals(AUTHOR_1_LAST_NAME, authors.get(1).lastName());
+    }
+
+    @Test
+    void testAuthorsNoAuthors() throws IOException
+    {
+        String contentNoBookName = """
+                <?xml version="1.0" encoding="utf-8"?>
+                <FictionBook>
+                    <description>
+                        <title-info>
+                        </title-info>
+                    </description>
+                </FictionBook>""";
+
+        Path file = Files.writeString(
+                Files.createTempFile(tempDir, "testAuthorsNoAuthors", ".fb2"),
+                contentNoBookName
+        );
+        Fb2FileImpl fb2File = new Fb2FileImpl(file);
+        List<Fb2File.Author> authors = fb2File.authors();
+
+        assertEquals(0, authors.size());
+    }
+
+    @Test
+    void testAuthorsNoAuthorName() throws IOException
+    {
+        String contentNoBookName = """
+                <?xml version="1.0" encoding="utf-8"?>
+                <FictionBook>
+                    <description>
+                        <title-info>
+                            <author>
+                                <last-name>Last name</last-name>
+                            </author>
+                        </title-info>
+                    </description>
+                </FictionBook>""";
+
+        Path file = Files.writeString(
+                Files.createTempFile(tempDir, "testAuthorsNoAuthorName", ".fb2"),
+                contentNoBookName
+        );
+        Fb2FileImpl fb2File = new Fb2FileImpl(file);
+        List<Fb2File.Author> authors = fb2File.authors();
+
+        assertEquals(1, authors.size());
+        assertTrue(authors.getFirst().name().isEmpty());
+    }
+
+    @Test
+    void testAuthorsBlankAuthorName() throws IOException
+    {
+        String contentNoBookName = """
+                <?xml version="1.0" encoding="utf-8"?>
+                <FictionBook>
+                    <description>
+                        <title-info>
+                            <author>
+                                <first-name>  </first-name>
+                                <last-name>Last name</last-name>
+                            </author>
+                        </title-info>
+                    </description>
+                </FictionBook>""";
+
+        Path file = Files.writeString(
+                Files.createTempFile(tempDir, "testAuthorsBlankAuthorName", ".fb2"),
+                contentNoBookName
+        );
+        Fb2FileImpl fb2File = new Fb2FileImpl(file);
+        List<Fb2File.Author> authors = fb2File.authors();
+
+        assertEquals(1, authors.size());
+        assertTrue(authors.getFirst().name().isEmpty());
+    }
+
+    @Test
+    void testAuthorsNoAuthorLastName() throws IOException
+    {
+        String contentNoBookName = """
+                <?xml version="1.0" encoding="utf-8"?>
+                <FictionBook>
+                    <description>
+                        <title-info>
+                            <author>
+                                <first-name>Name</first-name>
+                            </author>
+                        </title-info>
+                    </description>
+                </FictionBook>""";
+
+        Path file = Files.writeString(
+                Files.createTempFile(tempDir, "testAuthorsNoAuthorLastName", ".fb2"),
+                contentNoBookName
+        );
+        Fb2FileImpl fb2File = new Fb2FileImpl(file);
+        List<Fb2File.Author> authors = fb2File.authors();
+
+        assertEquals(1, authors.size());
+        assertTrue(authors.getFirst().lastName().isEmpty());
+    }
+
+    @Test
+    void testAuthorsBlankAuthorLastName() throws IOException
+    {
+        String contentNoBookName = """
+                <?xml version="1.0" encoding="utf-8"?>
+                <FictionBook>
+                    <description>
+                        <title-info>
+                            <author>
+                                <first-name>Name</first-name>
+                                <last-name>   </last-name>
+                            </author>
+                        </title-info>
+                    </description>
+                </FictionBook>""";
+
+        Path file = Files.writeString(
+                Files.createTempFile(tempDir, "testAuthorsBlankAuthorLastName", ".fb2"),
+                contentNoBookName
+        );
+        Fb2FileImpl fb2File = new Fb2FileImpl(file);
+        List<Fb2File.Author> authors = fb2File.authors();
+
+        assertEquals(1, authors.size());
+        assertTrue(authors.getFirst().lastName().isEmpty());
     }
 }

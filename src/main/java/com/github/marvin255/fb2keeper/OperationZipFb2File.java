@@ -16,18 +16,17 @@ public final class OperationZipFb2File implements Function<Fb2KeeperOperationCon
     public Fb2KeeperOperationContext apply(Fb2KeeperOperationContext fb2KeeperOperationContext)
     {
         Path file = FileSystemHelper.checkAndReturnFile(fb2KeeperOperationContext.path());
-        Path target = FileSystemHelper.checkAndReturnDir(fb2KeeperOperationContext.target());
-        Path archive = getArchivePath(target, file);
+        Path archive = getArchivePath(file);
 
         zipFile(file, archive);
 
         return fb2KeeperOperationContext.withPath(archive);
     }
 
-    private static Path getArchivePath(Path target, Path file)
+    private static Path getArchivePath(Path file)
     {
         return Paths.get(
-                target.toAbsolutePath().toString(),
+                file.getParent().toString(),
                 FileSystemHelper.getFileNameWithoutExtension(file)
                         + "." + FileSystemHelper.getFB2ZipExtension()
         );

@@ -18,8 +18,6 @@ final class OperationZipFb2FileTest
     @TempDir
     private Path tempDir;
 
-    private Path target;
-
     private Path file;
 
     private Fb2KeeperOperationContext context;
@@ -32,7 +30,7 @@ final class OperationZipFb2FileTest
                 Files.createTempFile(source, "file", ".txt"),
                 FILE_CONTENT
         );
-        target = Files.createTempDirectory(tempDir, "target");
+        Path target = Files.createTempDirectory(tempDir, "target");
         context = new Fb2KeeperOperationContext(file, source, target);
     }
 
@@ -40,7 +38,7 @@ final class OperationZipFb2FileTest
     void apply()
     {
         Path archivePath = Paths.get(
-                target.toAbsolutePath().toString(),
+                file.getParent().toString(),
                 FileSystemHelper.getFileNameWithoutExtension(file)
                         + "." + FileSystemHelper.getFB2ZipExtension()
         );

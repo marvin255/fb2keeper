@@ -43,11 +43,9 @@ public final class OperationUnzipFb2File implements Function<Fb2KeeperOperationC
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null)
             {
-                Path newPath = targetDir.resolve(entry.getName()).normalize();
-                if (!newPath.startsWith(targetDir))
-                {
-                    throw new IOException("Entry is outside target dir: " + entry.getName());
-                }
+                String newFileName = FileSystemHelper.getFileNameWithoutExtension(zipFile)
+                        + "." + FileSystemHelper.getExtension(entry.getName());
+                Path newPath = targetDir.resolve(newFileName).normalize();
                 if (!entry.isDirectory() && FileSystemHelper.isFB2(newPath))
                 {
                     unzippedFb2Path = newPath;

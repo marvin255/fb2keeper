@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 final class OperationCopyFileToTarget implements Function<Fb2KeeperOperationContext, Fb2KeeperOperationContext>
 {
-    private static final Pattern NON_ALPHA_NUMERIC_UNDERSCORE = Pattern.compile("[^A-Za-z0-9_]");
+    private static final Pattern NON_ALPHA_NUMERIC_UNDERSCORE = Pattern.compile("[^\\p{L}0-9_]");
 
     @Override
     public Fb2KeeperOperationContext apply(Fb2KeeperOperationContext fb2KeeperOperationContext)

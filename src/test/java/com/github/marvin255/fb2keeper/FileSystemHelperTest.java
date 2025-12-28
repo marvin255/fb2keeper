@@ -125,9 +125,10 @@ final class FileSystemHelperTest
     @Test
     void testGetExtensionWithNull()
     {
+        Path path = null;
         Exception exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> FileSystemHelper.getExtension(null)
+                () -> FileSystemHelper.getExtension(path)
         );
 
         assertEquals("Path can't be null", exception.getMessage());

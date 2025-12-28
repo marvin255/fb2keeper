@@ -199,6 +199,104 @@ final class OperationRenameToBookNameTest
     }
 
     @Test
+    void applyNoAuthors() throws IOException
+    {
+        String contentNoAuthors = """
+                <?xml version="1.0" encoding="utf-8"?>
+                <FictionBook>
+                    <description>
+                        <title-info>
+                            <book-title>%s</book-title>
+                        </title-info>
+                    </description>
+                </FictionBook>"""
+                .formatted(BOOK_TITLE);
+
+        Path file = Files.writeString(
+                Files.createTempFile(sourceDir, "file", ".fb2"),
+                contentNoAuthors
+        );
+        Fb2KeeperOperationContext context = new Fb2KeeperOperationContext(file, sourceDir, targetDir);
+
+        OperationRenameToBookName operation = new OperationRenameToBookName();
+
+        assertThrows(
+                RuntimeException.class,
+                () -> operation.apply(context)
+        );
+    }
+
+    @Test
+    void applyEmptyAuthorName() throws IOException
+    {
+        String contentNoBookName = """
+                <?xml version="1.0" encoding="utf-8"?>
+                <FictionBook>
+                    <description>
+                        <title-info>
+                            <author>
+                                <first-name></first-name>
+                                <last-name>%s</last-name>
+                            </author>
+                            <book-title>%s</book-title>
+                        </title-info>
+                    </description>
+                </FictionBook>"""
+                .formatted(
+                        AUTHOR_LAST_NAME,
+                        BOOK_TITLE
+                );
+
+        Path file = Files.writeString(
+                Files.createTempFile(sourceDir, "file", ".fb2"),
+                contentNoBookName
+        );
+        Fb2KeeperOperationContext context = new Fb2KeeperOperationContext(file, sourceDir, targetDir);
+
+        OperationRenameToBookName operation = new OperationRenameToBookName();
+
+        assertThrows(
+                RuntimeException.class,
+                () -> operation.apply(context)
+        );
+    }
+
+    @Test
+    void applyEmptyAuthorLastName() throws IOException
+    {
+        String contentNoBookName = """
+                <?xml version="1.0" encoding="utf-8"?>
+                <FictionBook>
+                    <description>
+                        <title-info>
+                            <author>
+                                <first-name>%s</first-name>
+                                <last-name></last-name>
+                            </author>
+                            <book-title>%s</book-title>
+                        </title-info>
+                    </description>
+                </FictionBook>"""
+                .formatted(
+                        AUTHOR_FIRST_NAME,
+                        BOOK_TITLE
+                );
+
+        Path file = Files.writeString(
+                Files.createTempFile(sourceDir, "file", ".fb2"),
+                contentNoBookName
+        );
+        Fb2KeeperOperationContext context = new Fb2KeeperOperationContext(file, sourceDir, targetDir);
+
+        OperationRenameToBookName operation = new OperationRenameToBookName();
+
+        assertThrows(
+                RuntimeException.class,
+                () -> operation.apply(context)
+        );
+    }
+
+    @Test
     void applyAuthorDirIsAFile() throws IOException
     {
         Path file = Files.writeString(

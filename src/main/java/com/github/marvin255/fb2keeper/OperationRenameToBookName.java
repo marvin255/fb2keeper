@@ -1,10 +1,8 @@
 package com.github.marvin255.fb2keeper;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
+import com.github.marvin255.fb2keeper.fb2file.Fb2File;
+import com.github.marvin255.fb2keeper.fb2file.Fb2FileFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,17 +16,32 @@ public final class OperationRenameToBookName implements Function<Fb2KeeperOperat
         Path filePath = FileSystemHelper.checkAndReturnFile(fb2KeeperOperationContext.path());
         Path targetDirPath = FileSystemHelper.checkAndReturnDir(fb2KeeperOperationContext.target());
 
-        BookData bookData = getBookData(filePath);
-        Path authorFolderPath = getAuthorFolder(targetDirPath, bookData);
-        Path newFilePath = renameFileUsingBookData(filePath, authorFolderPath, bookData);
+        Fb2File file = Fb2FileFactory.createFromPath(filePath);
+        Path authorFolderPath = getAuthorFolder(targetDirPath, file);
+        Path newFilePath = renameFileUsingBookData(filePath, authorFolderPath, file);
 
         return fb2KeeperOperationContext.withPath(newFilePath);
     }
 
-    private Path getAuthorFolder(Path baseDir, BookData bookData)
+    private Path getAuthorFolder(Path baseDir, Fb2File file)
     {
+        if (file.authors().isEmpty())
+        {
+            throw new RuntimeException("No authors found");
+        }
+
+        Fb2File.Author author = file.authors().getFirst();
+        if (author.lastName().isEmpty())
+        {
+            throw new RuntimeException("No last name for author found");
+        }
+        if (author.name().isEmpty())
+        {
+            throw new RuntimeException("No name for author found");
+        }
+
         return StripedPathLocker.runLockedFunction(
-                baseDir.resolve(bookData.author()),
+                baseDir.resolve(author.lastName() + " " + author.name()),
                 this::createAndReturnAuthorFolder
         );
     }
@@ -57,11 +70,16 @@ public final class OperationRenameToBookName implements Function<Fb2KeeperOperat
         return authorFolderPath.toAbsolutePath();
     }
 
-    private Path renameFileUsingBookData(Path filePath, Path targetDirPath, BookData bookData)
+    private Path renameFileUsingBookData(Path filePath, Path targetDirPath, Fb2File file)
     {
+        if (file.title().isEmpty())
+        {
+            throw new RuntimeException("Book title can't be empty");
+        }
+
         return StripedPathLocker.runLockedFunction(
                 targetDirPath.resolve(
-                        bookData.name() + "." + FileSystemHelper.getExtension(filePath)
+                        file.title() + "." + FileSystemHelper.getExtension(filePath)
                 ),
                 p -> renameFile(filePath, p)
         );
@@ -86,59 +104,5 @@ public final class OperationRenameToBookName implements Function<Fb2KeeperOperat
         }
 
         return to.toAbsolutePath();
-    }
-
-    private BookData getBookData(Path filePath)
-    {
-        Document doc = openDocument(filePath);
-
-        String authorName = extractStringValueFromDocument(
-                doc,
-                "FictionBook > description > title-info > author > first-name"
-        );
-        String authorLastName = extractStringValueFromDocument(
-                doc,
-                "FictionBook > description > title-info > author > last-name"
-        );
-        String name = extractStringValueFromDocument(
-                doc,
-                "FictionBook > description > title-info > book-title"
-        );
-
-        return new BookData(authorLastName + " " + authorName, name);
-    }
-
-    private Document openDocument(Path filePath)
-    {
-        try
-        {
-            File file = new File(filePath.toAbsolutePath().toString());
-            return Jsoup.parse(file);
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private String extractStringValueFromDocument(Document doc, String cssQuery)
-    {
-        Element element = doc.selectFirst(cssQuery);
-        if (element == null)
-        {
-            throw new RuntimeException("Field '%s' is not found".formatted(cssQuery));
-        }
-
-        String value = element.text().trim();
-        if (value.isEmpty())
-        {
-            throw new RuntimeException("Field '%s' can't be empty".formatted(cssQuery));
-        }
-
-        return value;
-    }
-
-    private record BookData(String author, String name)
-    {
     }
 }
